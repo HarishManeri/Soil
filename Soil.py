@@ -1,12 +1,5 @@
 import streamlit as st
 import random
-import numpy as np
-from PIL import Image
-from tensorflow.keras.models import load_model
-
-# Load your pre-trained model for image classification
-# Make sure to replace 'path_to_your_image_model.h5' with the actual path to your model
-image_model = load_model('path_to_your_image_model.h5')
 
 def analyze_soil(soil_types):
     """Simulates soil analysis and provides crop recommendations."""
@@ -34,20 +27,6 @@ def analyze_soil(soil_types):
             recommendations.append(random.choice(all_crops))
         crop_recommendations[soil] = recommendations
     return crop_recommendations
-
-def preprocess_image(image):
-    """Preprocess the uploaded image for prediction."""
-    image = image.resize((224, 224))  # Resize to match model input
-    image_array = np.array(image) / 255.0  # Normalize the image
-    image_array = np.expand_dims(image_array, axis=0)  # Expand dimensions
-    return image_array
-
-def predict_disease_from_image(image):
-    """Predict disease based on the uploaded image."""
-    processed_image = preprocess_image(image)
-    prediction = image_model.predict(processed_image)
-    predicted_class = np.argmax(prediction, axis=1)
-    return predicted_class
 
 def predict_disease(crop):
     """Simulates plant disease prediction based on user input."""
@@ -103,23 +82,6 @@ if st.button("Check Disease"):
         st.subheader("Precautions:")
         st.write(", ".join(precautions))
 
-# Input for crop image upload
-st.subheader("Upload Crop Image for Disease Prediction")
-uploaded_image = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-
-if uploaded_image is not None:
-    # Read the image file using PIL
-    image = Image.open(uploaded_image)
-    
-    # Display the uploaded image
-    st.image(image, caption='Uploaded Image', use_column_width=True)
-
-    # Predict disease from the uploaded image
-    if st.button("Predict Disease from Image"):
-        predicted_class = predict_disease_from_image(image)
-        st.subheader("Predicted Class from Image:")
-        st.write(predicted_class)  # You may want to map this to actual disease names
-
 # Run the Streamlit app
 if __name__ == "__main__":
-    st.write("This application provides crop recommendations based on soil types and predicts diseases for specific crops.")
+    st.write("This application provides crop recommendations based
