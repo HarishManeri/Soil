@@ -1,5 +1,12 @@
 import streamlit as st
 import random
+import numpy as np
+import cv2
+from keras.models import load_model
+
+# Load your pre-trained model for image classification
+# Make sure to replace 'path_to_your_image_model.h5' with the actual path to your model
+image_model = load_model('path_to_your_image_model.h5')
 
 def analyze_soil(soil_types):
     """Simulates soil analysis and provides crop recommendations."""
@@ -28,6 +35,21 @@ def analyze_soil(soil_types):
         crop_recommendations[soil] = recommendations
     return crop_recommendations
 
+def preprocess_image(image):
+    """Preprocess the uploaded image for prediction."""
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+    image = cv2.resize(image, (224, 224))  # Resize to match model input
+    image = image / 255.0  # Normalize the image
+    image = np.expand_dims(image, axis=0)  # Expand dimensions
+    return image
+
+def predict_disease_from_image(image):
+    """Predict disease based on the uploaded image."""
+    processed_image = preprocess_image(image)
+    prediction = image_model.predict(processed_image)
+    predicted_class = np.argmax(prediction, axis=1)
+    return predicted_class
+
 def predict_disease(crop):
     """Simulates plant disease prediction based on user input."""
     possible_diseases = [
@@ -54,34 +76,4 @@ def predict_disease(crop):
     return predicted_disease, precautions
 
 # Streamlit app
-st.title("Crop Recommendation and Disease Prediction based upon soil")
-
-# Input for soil types
-num_soil_types = st.number_input("Enter the number of soil types you want to analyze (at least 1):", min_value=1)
-soil_types = []
-
-for i in range(num_soil_types):
-    soil_type = st.text_input(f"Enter soil type {i + 1}:")
-    if soil_type:
-        soil_types.append(soil_type)
-
-if st.button("Get Crop Recommendations"):
-    if soil_types:
-        crop_recommendations = analyze_soil(soil_types)
-        for soil, crops in crop_recommendations.items():
-            st.subheader(f"Recommended crops for {soil}:")
-            st.write(", ".join(crops))
-
-# Input for crop disease prediction
-crop_to_check = st.text_input("Enter the crop you want to check for disease:")
-if st.button("Check Disease"):
-    if crop_to_check:
-        predicted_disease, precautions = predict_disease(crop_to_check)
-        st.subheader("Predicted Disease:")
-        st.write(predicted_disease)
-        st.subheader("Precautions:")
-        st.write(", ".join(precautions))
-
-# Run the Streamlit app
-if __name__ == "__main__":
-    st.write("This application provides crop recommendations based on soil types and predicts diseases for specific crops.")
+st.title("Crop Recommendation and Disease Prediction based
