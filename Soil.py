@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import numpy as np
 from PIL import Image
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 
 # Load your pre-trained model for image classification
 # Make sure to replace 'path_to_your_image_model.h5' with the actual path to your model
